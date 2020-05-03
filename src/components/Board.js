@@ -4,7 +4,8 @@ import Tile from './Tile'
 
 
 
-export default function ({ rowCount = 4, colCount = 4, tiles = [] }) {
+export default function ({ rowCount = 4, colCount = 4, tilewidth, tileheight, tiles = [] }) {
+    console.log(tiles)
     let grid = "";
     for (var i = 0; i < colCount; i++) {
         grid += "1fr ";
@@ -18,10 +19,19 @@ export default function ({ rowCount = 4, colCount = 4, tiles = [] }) {
             {Array.from(new Array(total)).map(_ => <div className="grid-item"></div>)}
         </div>
 
-        <div className="tile-container">{
-            tiles.map(tile => <Tile number={tile.number} />)
-        }
-            <Tile number={1024} />
+        <div className="tile-container">
+            {
+                // container的放tile的位置
+                tiles.map((row, i) => {
+                    debugger;
+                    row.map((number, j) => {
+                        const top = (i + 1) * 10 + tileheight * i;
+                        const left = (j + 1) * 10 + tilewidth * j;
+                        return <Tile width={tilewidth} height={tileheight} style={{ top: top, left: left }} number={number} />
+                    })
+                })
+            }
+            {/* <Tile number={1024} /> */}
         </div> </>
 }
 

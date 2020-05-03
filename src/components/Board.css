@@ -1,18 +1,26 @@
-.grid-background{
-    width: 500px;
-    height: 500px;
-    
+.grid-background {
+  width: 500px;
+  height: 500px;
 }
-.grid-background{
+
+.grid-background {
+  position: absolute;
   display: grid;
   background-color: #bbada0;
-  grid-gap: 10px ;
+  grid-gap: 10px;
   padding: 10px;
-  }
-.grid-item {
-  background: rgba(238,228,218,.35);
+}
 
+.grid-item {
+  background: rgba(238, 228, 218, .35);
   padding: 20px;
   font-size: 30px;
   text-align: center;
+}
+
+.tile-container {
+  position: absolute;
+  z-index: 0;
+  width: 520px;
+  height: 520px;
 }
