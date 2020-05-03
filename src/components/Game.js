@@ -2,32 +2,21 @@ import React, { useState, useEffect } from 'react';
 import './Game.css'
 import Board from './Board'
 
-const randomPick = array => array[Math.floor(Math.random() * array.length)]
+const randomPick = array => array[Math.floor(Math.random() * array.length)];
 const random24 = () => randomPick([2, 2, 2, 2, 2, 4]);
-function addTile(tiles, rowCount, colCount) {
 
-    const format = tile => `${tile.row},${tile.col}`;
-    // format是已有tile
-    // 找空格子,放入变量
 
-    const currentBlocks = new Set(tiles.map(format));
-    let emptyBlocks = []
-    for (var i = 0; i < rowCount; i++) {
-        for (var j = 0; j < colCount; j++) {
-            if (!currentBlocks.has(`${i},${j}`)) {
-                emptyBlocks.push({
-                    row: i,
-                    col: j,
-                })
-            }
-        }
-    }
-    let picked = randomPick(emptyBlocks);
-    let newTile = { ...picked, number: random24() }
+function addTile(tiles) {
+    // 初始加新tiles
+    let emptyBlocks = tiles.flatMap(
+        (row, i) => {
+            row.map((number, j) => number == undefined ? [i, j] : undefined)
+        }).filter(value => value != undefined);
 
-    // 设定settile规则再运行
-    return [...tiles, newTile];
-    // tile(row,col,number) 
+    // [[i,j],undefined,...],去除undi
+    const [i,j]=randomPick(emptyBlocks);
+    tiles[i][j]=random24();
+    return tiles
 }
 
 function doUp(tiles) {
