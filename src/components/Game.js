@@ -10,12 +10,12 @@ function addTile(tiles) {
     // 初始加新tiles
     let emptyBlocks = tiles.flatMap(
         (row, i) => {
-            row.map((number, j) => number == undefined ? [i, j] : undefined)
+            return row.map((number, j) => number == undefined ? [i, j] : undefined)
         }).filter(value => value != undefined);
 
-    // [[i,j],undefined,...],去除undi
-    const [i,j]=randomPick(emptyBlocks);
-    tiles[i][j]=random24();
+    // [[i,j],undefined,...],去除unde
+    const [i, j] = randomPick(emptyBlocks);
+    tiles[i][j] = random24();
     return tiles
 }
 
@@ -35,6 +35,7 @@ function doUp(tiles) {
                             tiles[i][j] *= 2;
                             tiles[k][j] = undefined
                         }
+                        break;
                     }
                 }
             }
@@ -78,6 +79,7 @@ function doDown(tiles) {
                             tiles[k][j] = undefined
 
                         }
+                        break;
                     }
                 }
             }
@@ -104,7 +106,6 @@ function doDown(tiles) {
     return tiles
 }
 
-
 function doLeft(tiles) {
     for (var i = 0; i < tiles.length; i++) {
         //先循环行
@@ -120,8 +121,8 @@ function doLeft(tiles) {
                             // 他们相等
                             tiles[i][j] *= 2;
                             tiles[i][k] = undefined
-
                         }
+                        break;
                     }
                 }
             }
@@ -148,8 +149,6 @@ function doLeft(tiles) {
     return tiles
 }
 
-
-
 function doRight(tiles) {
     for (var i = 0; i < tiles.length; i++) {
         //先循环行
@@ -167,6 +166,7 @@ function doRight(tiles) {
                             tiles[i][k] = undefined
 
                         }
+                        break;
                     }
                 }
             }
@@ -194,24 +194,6 @@ function doRight(tiles) {
     return tiles
 }
 
-
-
-function doCols(func, tiles, colCount) {
-    const transposed = tiles[0].map((_, j) =>
-        // 得到j,0,1,2,3
-        tiles.map((row => row[j])));
-    // 得到第j列,[1,5,9 ][2,6,10]
-    const processed = transposed.map(func);
-
-}
-
-function doRows(func, tiles, rowCount) {
-    tiles[0].map()
-}
-
-
-
-
 export default function () {
     const rowCount = 4;
     const colCount = 4;
@@ -227,44 +209,67 @@ export default function () {
     }
     const [tiles, setTiles] = useState(initValue);
 
-    function onKeyDown(event) {
+    function onKeyDown(event, tiles) {
         // 上下左右的按键关联
         let newTiles;
         switch (event.key) {
             case "ArrowUp":
                 newTiles = doUp(tiles);
-                // 
-                setTiles(newTiles)
+
                 break;
             case "ArrowRight":
                 newTiles = doRight(tiles);
-                setTiles(newTiles)
                 break;
             case "ArrowDown":
                 newTiles = doDown(tiles);
-                setTiles(newTiles)
                 break;
             case "ArrowLeft":
                 newTiles = doLeft(tiles);
-                setTiles(newTiles)
                 break;
+        }
+        if (newTiles) {
+            newTiles = addTile(newTiles);
+            // 有更新则
+            setTiles([...newTiles]);
         }
     }
 
     useEffect(() => {
-        let newTiles = addTile(tiles, rowCount, colCount);
-        newTiles = addTile(newTiles, rowCount, colCount);
-        setTiles(newTiles);
-        document.onkeydown = onKeyDown;
+        // 初始化
+        // let newTiles = addTile(tiles, rowCount, colCount);
+        // newTiles = addTile(newTiles, rowCount, colCount);
+        let newTiles = [[4, undefined, undefined, undefined], [2, undefined, undefined, undefined], [2, undefined, undefined, undefined], [undefined, undefined, undefined, undefined]]
+        setTiles([...newTiles]);
+        document.onkeydown = (event) => onKeyDown(event, newTiles);
     }, []);
 
+    function newGame(){
+        const initValue = []
+        for (var i = 0; i < rowCount; i++) {
+            let row = [];
+            for (var j = 0; j < colCount; j++) {
+                row.push(undefined);
+            }
+            initValue.push(row);}
 
-    return <div className="game">
+        let newTiles = addTile(tiles, rowCount, colCount);
+        newTiles = addTile(newTiles, rowCount, colCount)
+        
+    } 
+
+    return <><div className="game">
         <Board tiles={tiles}
             rowCount={rowCount}
             colCount={colCount}
             tilewidth={tilewidth}
             tileheight={tileheight}
         />
+
     </div>
-}
+ 
+        <div>
+           
+            <button className="button" onClick={newGame}> New game </button>
+            </div>
+        </>
+            }

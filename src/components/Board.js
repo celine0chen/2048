@@ -23,8 +23,9 @@ export default function ({ rowCount = 4, colCount = 4, tilewidth, tileheight, ti
             {
                 // container的放tile的位置
                 tiles.map((row, i) => {
-
-                    row.map((number, j) => {
+                    return row.map((number, j) => {
+                        if (number==undefined)
+                        return undefined;
                         const top = (i + 1) * 10 + tileheight * i;
                         const left = (j + 1) * 10 + tilewidth * j;
                         return <Tile width={tilewidth} height={tileheight} style={{ top: top, left: left }} number={number} />
