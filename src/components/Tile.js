@@ -26,7 +26,7 @@ export default function ({ number = 2, width , height, style={} }) {
         width: width,
         height: height,
         color: color,
-        backgroundColor: NumberBgColor[number], 
+        backgroundColor: NumberBgColor[number] || "#3c3a32", 
         boxShadow: boxShadow,
         ...style
     }}>

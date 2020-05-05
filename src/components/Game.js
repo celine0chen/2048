@@ -216,11 +216,11 @@ export default function () {
     const tilewidth = (500 - (colCount - 1) * 10) / colCount;
     const tileheight = (500 - (rowCount - 1) * 10) / rowCount;
     const [tiles, setTiles] = useState();
-    const [game, setGameState] = useState(GameState.Playing);
+    const [game, setGameState] = useState({ status: GameState.Playing });
 
-    function onKeyDown(event, tiles) {
+    function onKeyDown(event, tiles, game) {
         // 上下左右的按键关联
-        if (game != GameState.Playing)
+        if (game.status != GameState.Playing)
             return;
         let newTiles, changed;
         switch (event.key) {
@@ -246,7 +246,7 @@ export default function () {
                 setTiles([...newTiles]);
             }
             else if (emptyCount == 0) {
-                setGameState(GameState.Lost);
+                setGameState({ status: GameState.Lost });
 
             }
 
@@ -260,6 +260,11 @@ export default function () {
 
     }, []);
 
+    useEffect(() => {
+        document.onkeydown = (event) =>
+            onKeyDown(event, tiles,game);
+    },[game]);
+
     function newGame() {
         const initValue = []
         for (var i = 0; i < rowCount; i++) {
@@ -272,9 +277,11 @@ export default function () {
 
         let newTiles = addTile(initValue, rowCount, colCount);
         newTiles = addTile(newTiles, rowCount, colCount);
+        // let newTiles = [[4097, undefined, undefined, undefined], [2, undefined, undefined, undefined], [2, undefined, undefined, undefined], [undefined, undefined, undefined, undefined]]
         setTiles([...newTiles]);
-        document.onkeydown = (event) => onKeyDown(event, newTiles);
-        setGameState(GameState.Playing)
+        document.onkeydown = (event) => onKeyDown(event, newTiles,game);
+        game.status = GameState.Playing;
+        setGameState({ ...game });
         return newTiles;
 
     }
@@ -287,10 +294,21 @@ export default function () {
             tileheight={tileheight}
         />
         {
-            game == GameState.Lost ?
+            game.status === GameState.Lost ?
                 <div className="message">
                     You Lost
             <button className="button" onClick={newGame}> New game </button>
+                </div> : null
+        }
+        {
+            game.status === GameState.Won ?
+                <div className="message">
+                    You Won
+            <button className="button" onClick={() => {
+                        game.status = GameState.Playing;
+                        setGameState({ ...game });
+                    }
+                    }> Continue </button>
                 </div> : null
         }
 

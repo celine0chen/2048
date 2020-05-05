@@ -10,5 +10,14 @@ code {
 }
 
 * {
-  box-sizing: border-box
+  box-sizing: border-box;
+}
+
+body {
+  background: #faf8ef;
+  background-image: url(./image/2048bg.webp);
+  background-position: 0 0;
+  background-repeat: repeat;
+  top: 0;
+  bottom: 0;
 }
