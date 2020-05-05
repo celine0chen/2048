@@ -20,6 +20,7 @@ function addTile(tiles) {
 }
 
 function doUp(tiles) {
+    let changed = false;
     // 函数是向上合并得出新number
     for (var j = 0; j < tiles[0].length; j++) {
         //先循环列
@@ -33,7 +34,8 @@ function doUp(tiles) {
                         if (tiles[i][j] == tiles[k][j]) {
                             // 他们相等
                             tiles[i][j] *= 2;
-                            tiles[k][j] = undefined
+                            tiles[k][j] = undefined;
+                            changed = true;
                         }
                         break;
                     }
@@ -55,14 +57,16 @@ function doUp(tiles) {
                     tiles[spaceMark][j] = tiles[i][j];
                     tiles[i][j] = undefined;
                     spaceMark++;
+                    changed = true;
                 }
             }
         }
     }
-    return tiles
+    return [tiles, changed]
 }
 
 function doDown(tiles) {
+    let changed = false;
     for (var j = 0; j < tiles[0].length; j++) {
         //先循环列
         for (var i = tiles.length - 1; i > 0; i--) {
@@ -76,8 +80,8 @@ function doDown(tiles) {
                         if (tiles[i][j] == tiles[k][j]) {
                             // 他们相等
                             tiles[i][j] *= 2;
-                            tiles[k][j] = undefined
-
+                            tiles[k][j] = undefined;
+                            changed = true;
                         }
                         break;
                     }
@@ -99,14 +103,16 @@ function doDown(tiles) {
                     tiles[spaceMark][j] = tiles[i][j];
                     tiles[i][j] = undefined;
                     spaceMark--;
+                    changed = true;
                 }
             }
         }
     }
-    return tiles
+    return [tiles, changed]
 }
 
 function doLeft(tiles) {
+    let changed = false;
     for (var i = 0; i < tiles.length; i++) {
         //先循环行
         for (var j = 0; j < tiles[0].length - 1; j++) {
@@ -120,7 +126,7 @@ function doLeft(tiles) {
                         if (tiles[i][j] == tiles[i][k]) {
                             // 他们相等
                             tiles[i][j] *= 2;
-                            tiles[i][k] = undefined
+                            tiles[i][k] = undefined; changed = true;
                         }
                         break;
                     }
@@ -142,14 +148,16 @@ function doLeft(tiles) {
                     tiles[i][spaceMark] = tiles[i][j];
                     tiles[i][j] = undefined;
                     spaceMark++;
+                    changed = true;
                 }
             }
         }
     }
-    return tiles
+    return [tiles, changed]
 }
 
 function doRight(tiles) {
+    let changed = false;
     for (var i = 0; i < tiles.length; i++) {
         //先循环行
         for (var j = tiles[0].length - 1; j > 0; j--) {
@@ -163,8 +171,8 @@ function doRight(tiles) {
                         if (tiles[i][j] == tiles[i][k]) {
                             // 他们相等
                             tiles[i][j] *= 2;
-                            tiles[i][k] = undefined
-
+                            tiles[i][k] = undefined;
+                            changed = true;
                         }
                         break;
                     }
@@ -187,75 +195,89 @@ function doRight(tiles) {
                     tiles[i][spaceMark] = tiles[i][j];
                     tiles[i][j] = undefined;
                     spaceMark--;
+                    changed = true;
                 }
             }
         }
     }
-    return tiles
+    return [tiles, changed]
 }
+
+const GameState = Object.freeze({
+    Playing: Symbol("Playing"),
+    Won: Symbol("Won"),
+    Lost: Symbol("Lost"),
+}
+);
 
 export default function () {
     const rowCount = 4;
     const colCount = 4;
     const tilewidth = (500 - (colCount - 1) * 10) / colCount;
     const tileheight = (500 - (rowCount - 1) * 10) / rowCount;
-    const initValue = []
-    for (var i = 0; i < rowCount; i++) {
-        let row = [];
-        for (var j = 0; j < colCount; j++) {
-            row.push(undefined);
-        }
-        initValue.push(row);
-    }
-    const [tiles, setTiles] = useState(initValue);
+    const [tiles, setTiles] = useState();
+    const [game, setGameState] = useState(GameState.Playing);
 
     function onKeyDown(event, tiles) {
         // 上下左右的按键关联
-        let newTiles;
+        if (game != GameState.Playing)
+            return;
+        let newTiles, changed;
         switch (event.key) {
             case "ArrowUp":
-                newTiles = doUp(tiles);
-
+                [newTiles, changed] = doUp(tiles);
                 break;
             case "ArrowRight":
-                newTiles = doRight(tiles);
+                [newTiles, changed] = doRight(tiles);
                 break;
             case "ArrowDown":
-                newTiles = doDown(tiles);
+                [newTiles, changed] = doDown(tiles);
                 break;
             case "ArrowLeft":
-                newTiles = doLeft(tiles);
+                [newTiles, changed] = doLeft(tiles);
                 break;
         }
         if (newTiles) {
-            newTiles = addTile(newTiles);
-            // 有更新则
-            setTiles([...newTiles]);
+            const emptyCount = newTiles.flatMap((row) => row.filter(number => number === undefined)).length;
+            if (changed) {
+                // if emptyBlocks
+                newTiles = addTile(newTiles);
+                // 有更新则
+                setTiles([...newTiles]);
+            }
+            else if (emptyCount == 0) {
+                setGameState(GameState.Lost);
+
+            }
+
         }
     }
 
     useEffect(() => {
         // 初始化
-        // let newTiles = addTile(tiles, rowCount, colCount);
-        // newTiles = addTile(newTiles, rowCount, colCount);
-        let newTiles = [[4, undefined, undefined, undefined], [2, undefined, undefined, undefined], [2, undefined, undefined, undefined], [undefined, undefined, undefined, undefined]]
-        setTiles([...newTiles]);
-        document.onkeydown = (event) => onKeyDown(event, newTiles);
+        newGame();
+        // let newTiles = [[4, undefined, undefined, undefined], [2, undefined, undefined, undefined], [2, undefined, undefined, undefined], [undefined, undefined, undefined, undefined]]
+
     }, []);
 
-    function newGame(){
+    function newGame() {
         const initValue = []
         for (var i = 0; i < rowCount; i++) {
             let row = [];
             for (var j = 0; j < colCount; j++) {
                 row.push(undefined);
             }
-            initValue.push(row);}
+            initValue.push(row);
+        }
 
-        let newTiles = addTile(tiles, rowCount, colCount);
-        newTiles = addTile(newTiles, rowCount, colCount)
-        
-    } 
+        let newTiles = addTile(initValue, rowCount, colCount);
+        newTiles = addTile(newTiles, rowCount, colCount);
+        setTiles([...newTiles]);
+        document.onkeydown = (event) => onKeyDown(event, newTiles);
+        setGameState(GameState.Playing)
+        return newTiles;
+
+    }
 
     return <><div className="game">
         <Board tiles={tiles}
@@ -264,12 +286,21 @@ export default function () {
             tilewidth={tilewidth}
             tileheight={tileheight}
         />
+        {
+            game == GameState.Lost ?
+                <div className="message">
+                    You Lost
+            <button className="button" onClick={newGame}> New game </button>
+                </div> : null
+        }
 
     </div>
- 
+
         <div>
-           
+
             <button className="button" onClick={newGame}> New game </button>
-            </div>
-        </>
-            }
+        </div>
+
+
+    </>
+}
