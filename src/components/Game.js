@@ -15,7 +15,7 @@ function addTile(tiles) {
 
     // [[i,j],undefined,...],去除unde
     const [i, j] = randomPick(emptyBlocks);
-    tiles[i][j] = random24();
+    tiles[i][j] = { id: MAth.random(), num: random24() };
     return tiles
 }
 
@@ -31,9 +31,9 @@ function doUp(tiles) {
                 for (var k = i + 1; k < tiles.length; k++) {
                     if (tiles[k][j] != undefined) {
                         // 其下一个元素非0
-                        if (tiles[i][j] == tiles[k][j]) {
+                        if (tiles[i][j].num== tiles[k][j].num) {
                             // 他们相等
-                            tiles[i][j] *= 2;
+                            tiles[i][j].num*= 2;
                             tiles[k][j] = undefined;
                             changed = true;
                         }
@@ -77,9 +77,9 @@ function doDown(tiles) {
                     // 遍历主元素上面每一个
                     if (tiles[k][j] != undefined) {
                         // 找元素非0
-                        if (tiles[i][j] == tiles[k][j]) {
+                        if (tiles[i][j].num == tiles[k][j].num) {
                             // 他们相等
-                            tiles[i][j] *= 2;
+                            tiles[i][j].num*= 2;
                             tiles[k][j] = undefined;
                             changed = true;
                         }
@@ -123,9 +123,9 @@ function doLeft(tiles) {
                     // 遍历主元素右边的
                     if (tiles[i][k] != undefined) {
                         // 其右边一个元素非0
-                        if (tiles[i][j] == tiles[i][k]) {
+                        if (tiles[i][j].num == tiles[i][k]).num {
                             // 他们相等
-                            tiles[i][j] *= 2;
+                            tiles[i][j].num*= 2;
                             tiles[i][k] = undefined; changed = true;
                         }
                         break;
@@ -168,9 +168,9 @@ function doRight(tiles) {
                     // 遍历主元素左边的
                     if (tiles[i][k] != undefined) {
                         // 其左边一个元素非0
-                        if (tiles[i][j] == tiles[i][k]) {
+                        if (tiles[i][j].num == tiles[i][k].num) {
                             // 他们相等
-                            tiles[i][j] *= 2;
+                            tiles[i][j].num *= 2;
                             tiles[i][k] = undefined;
                             changed = true;
                         }
@@ -262,8 +262,8 @@ export default function () {
 
     useEffect(() => {
         document.onkeydown = (event) =>
-            onKeyDown(event, tiles,game);
-    },[game]);
+            onKeyDown(event, tiles, game);
+    }, [game]);
 
     function newGame() {
         const initValue = []
@@ -279,7 +279,7 @@ export default function () {
         newTiles = addTile(newTiles, rowCount, colCount);
         // let newTiles = [[4097, undefined, undefined, undefined], [2, undefined, undefined, undefined], [2, undefined, undefined, undefined], [undefined, undefined, undefined, undefined]]
         setTiles([...newTiles]);
-        document.onkeydown = (event) => onKeyDown(event, newTiles,game);
+        document.onkeydown = (event) => onKeyDown(event, newTiles, game);
         game.status = GameState.Playing;
         setGameState({ ...game });
         return newTiles;
